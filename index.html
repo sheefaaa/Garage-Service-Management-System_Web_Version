@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GARAGE SERVICE MANAGEMENT SYSTEM</title>
+  <link href="./dist/output.css" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/2e5107f23f.js" crossorigin="anonymous"></script>
+</head>
+<body class="min-h-screen bg-cover bg-center bg-fixed relative" 
+      style="background-image: url('images/Sanguine---8.png')">
+
+  <!-- Dark overlay -->
+  <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+
+  <div class="relative max-w-5xl mx-auto p-6 z-10">
+    <!-- Header -->
+    <h1 class="text-4xl font-extrabold text-center text-red-500 drop-shadow-lg mb-6">
+      Garage Service Management
+    </h1>
+
+    <!-- Add Job Form -->
+    <div class="bg-black/40 backdrop-blur-md shadow-2xl rounded-2xl p-6 mb-8 border border-red-500/40">
+      <h2 class="text-2xl font-semibold text-red-400 mb-4">Add New Job</h2>
+      <form id="jobForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input type="text" placeholder="Customer Name" id="customerName" class="bg-black/30 text-white placeholder-gray-300 border border-red-400/30 rounded p-2 focus:outline-none focus:ring-2 focus:ring-red-500" required />
+        <input type="text" placeholder="Contact Number" id="contact" class="bg-black/30 text-white placeholder-gray-300 border border-red-400/30 rounded p-2" required />
+        <input type="text" placeholder="Vehicle Type" id="vehicleType" class="bg-black/30 text-white border border-red-400/30 rounded p-2" required />
+        <input type="text" placeholder="Vehicle Number" id="vehicleNumber" class="bg-black/30 text-white border border-red-400/30 rounded p-2" required />
+        <input type="text" placeholder="Problem Description" id="problem" class="bg-black/30 text-white border border-red-400/30 rounded p-2 md:col-span-2" required />
+        <input type="date" id="date" class="bg-black/30 text-white border border-red-400/30 rounded p-2" required />
+        <input type="number" step="0.01" placeholder="Parts Cost" id="partsCost" class="bg-black/30 text-white border border-red-400/30 rounded p-2" required />
+        <input type="number" step="0.01" placeholder="Labor Cost" id="laborCost" class="bg-black/30 text-white border border-red-400/30 rounded p-2" required />
+        <button type="submit" class="bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition md:col-span-2">➕ Add Job</button>
+      </form>
+    </div>
+
+    <!-- Job List -->
+    <div class="bg-black/40 backdrop-blur-md shadow-2xl rounded-2xl p-6 border border-red-500/40">
+      <h2 class="text-2xl font-semibold text-red-400 mb-4">All Jobs</h2>
+      <table class="w-full text-left border-collapse text-white">
+        <thead>
+          <tr class="bg-red-600/70 text-white">
+            <th class="p-2">ID</th>
+            <th class="p-2">Customer</th>
+            <th class="p-2">Vehicle</th>
+            <th class="p-2">Status</th>
+            <th class="p-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="jobList"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    let jobs = JSON.parse(localStorage.getItem("jobs")) || [];
+
+    function saveJobs() {
+      localStorage.setItem("jobs", JSON.stringify(jobs));
+    }
+
+    function renderJobs() {
+      const tbody = document.getElementById("jobList");
+      tbody.innerHTML = "";
+      jobs.forEach((job, index) => {
+        tbody.innerHTML += `
+          <tr class="border-b border-gray-600/50">
+            <td class="p-2">${job.id}</td>
+            <td class="p-2">${job.customerName}</td>
+            <td class="p-2">${job.vehicleType} (${job.vehicleNumber})</td>
+            <td class="p-2">${job.status}</td>
+            <td class="p-2 space-x-2">
+              <button onclick="updateStatus(${index})" class="px-2 py-1 bg-yellow-500 hover:bg-yellow-600 text-white rounded">Update</button>
+              <button onclick="deleteJob(${index})" class="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded">Delete</button>
+              <button onclick="generateInvoice(${index})" class="px-2 py-1 bg-green-600 hover:bg-green-700 text-white rounded">Invoice</button>
+            </td>
+          </tr>`;
+      });
+    }
+
+    document.getElementById("jobForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const job = {
+        id: jobs.length ? jobs[jobs.length - 1].id + 1 : 1,
+        customerName: document.getElementById("customerName").value,
+        contact: document.getElementById("contact").value,
+        vehicleType: document.getElementById("vehicleType").value,
+        vehicleNumber: document.getElementById("vehicleNumber").value,
+        problem: document.getElementById("problem").value,
+        date: document.getElementById("date").value,
+        partsCost: parseFloat(document.getElementById("partsCost").value),
+        laborCost: parseFloat(document.getElementById("laborCost").value),
+        status: "Pending",
+      };
+      jobs.push(job);
+      saveJobs();
+      renderJobs();
+      e.target.reset();
+    });
+
+    function updateStatus(index) {
+      if (jobs[index].status === "Pending") jobs[index].status = "In Progress";
+      else if (jobs[index].status === "In Progress") jobs[index].status = "Completed";
+      else alert("Job already completed!");
+      saveJobs();
+      renderJobs();
+    }
+
+    function deleteJob(index) {
+      if (confirm("Are you sure to delete this job?")) {
+        jobs.splice(index, 1);
+        saveJobs();
+        renderJobs();
+      }
+    }
+
+    function generateInvoice(index) {
+      const job = jobs[index];
+      const total = job.partsCost + job.laborCost;
+      alert(`Invoice for Job ${job.id}\nCustomer: ${job.customerName}\nVehicle: ${job.vehicleType} (${job.vehicleNumber})\nParts: $${job.partsCost}\nLabor: $${job.laborCost}\nTotal: $${total}`);
+    }
+
+    renderJobs();
+  </script>
+</body>
+</html>

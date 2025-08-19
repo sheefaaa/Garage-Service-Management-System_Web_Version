@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@layer utilities {
+  .gradient-primary {
+    background: linear-gradient(45deg, #3490dc, #6574cd);
+  }
+  .gradient-secondary {
+    background: linear-gradient(90deg, #38b2ac, #4fd1c5);
+  }
+  .gradient-dark {
+    background: linear-gradient(135deg, #1a202c, #2d3748);
+  }
+  
+  /* Custom gradient utilities */
+  .bg-gradient-custom {
+    background: linear-gradient(var(--gradient-angle, 45deg), var(--gradient-from), var(--gradient-to));
+  }
+  
+  .gradient-blue-purple {
+    --gradient-from: #60a5fa;
+    --gradient-to: #a855f7;
+  }
+  
+  .gradient-green-blue {
+    --gradient-from: #4ade80;
+    --gradient-to: #3b82f6;
+  }
+  
+  .gradient-orange-pink {
+    --gradient-from: #f97316;
+    --gradient-to: #ec4899;
+  }
+  
+  /* Gradient angles */
+  .gradient-0 {
+    --gradient-angle: 0deg;
+  }
+  
+  .gradient-45 {
+    --gradient-angle: 45deg;
+  }
+  
+  .gradient-90 {
+    --gradient-angle: 90deg;
+  }
+  
+  .gradient-135 {
+    --gradient-angle: 135deg;
+  }
+  
+  .gradient-180 {
+    --gradient-angle: 180deg;
+  }
+}
